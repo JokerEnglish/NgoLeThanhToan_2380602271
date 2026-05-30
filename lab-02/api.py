@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify, json
 from cipher.caesar import CaesarCipher
 from cipher.vigenere import VigenereCipher 
 from cipher.railfence import RailFenceCipher
@@ -8,14 +8,33 @@ from cipher.transposition import TranspositionCipher
 app = Flask(__name__)
 
 caesar_cipher = CaesarCipher()
-
 vigenere_cipher = VigenereCipher()
-
 railfence_cipher = RailFenceCipher()
-
 playfair_cipher = PlayFairCipher()
-
 transposition_cipher = TranspositionCipher()
+
+
+@app.route("/")
+def home():
+    return render_template('index.html')
+
+@app.route("/caesar")
+def caesar():
+    return render_template('caesar.html')
+
+@app.route("/encrypt", methods=['POST'])
+def caesar_encrypt_web():
+    text = request.form['inputPlainText']
+    key = int(request.form['inputKeyPlain'])
+    encrypted_text = caesar_cipher.encrypt_text(text, key)
+    return f"text: {text}<br/>key: {key}<br/>encrypted text: {encrypted_text}"
+
+@app.route("/decrypt", methods=['POST'])
+def caesar_decrypt_web():
+    text = request.form['inputCipherText']
+    key = int(request.form['inputKeyCipher'])
+    decrypted_text = caesar_cipher.decrypt_text(text, key)
+    return f"text: {text}<br/>key: {key}<br/>decrypted text: {decrypted_text}"
 
 @app.route("/api/caesar/encrypt", methods=["POST"])
 def caesar_encrypt():
